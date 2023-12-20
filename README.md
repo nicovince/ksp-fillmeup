@@ -3,5 +3,11 @@
 Fill vessels tanks
 
 ```
-./ksp_fillmeup.py 'vessel name' --save-file /path/to/persistent.sfs
+./ksp_fillmeup.py --save-file /path/to/persistent.sfs fill 'vessel name'
+```
+
+List vessels:
+
+```
+./ksp_fillmeup.py --save-file /path/to/persistent.sfs list
 ```
