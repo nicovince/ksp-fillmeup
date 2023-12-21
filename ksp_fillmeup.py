@@ -3,6 +3,7 @@
 import sfsutils
 
 import argparse
+import shutil
 
 
 def fill(resource):
@@ -43,10 +44,11 @@ def find_vessel(vessels, name):
 
 
 def patch_sfs(sfs_file, ship_name, resource_types):
+    shutil.copy2(sfs_file, f"{sfs_file}.old")
     data = sfsutils.parse_savefile(sfs_file)
     vessel = find_vessel(data['GAME']['FLIGHTSTATE']['VESSEL'], ship_name)
     fill_vessel(vessel, resource_types)
-    sfsutils.writeout_savefile(data, destination_file=f"{sfs_file}.new")
+    sfsutils.writeout_savefile(data, destination_file=f"{sfs_file}")
 
 
 def list_vessels(sfs_file, show_debris):
