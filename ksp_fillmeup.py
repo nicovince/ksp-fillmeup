@@ -23,10 +23,7 @@ def fill_resources(resources, resource_types):
 
 def fill_vessel(vessel, resource_types):
     print(f"Process {vessel['name']}")
-    if type(vessel['PART']) == list:
-        parts_list = vessel['PART']
-    else:
-        parts_list = [vessel]
+    parts_list = get_vessel_parts(vessel)
     for p in parts_list:
         if 'RESOURCE' in p.keys():
             fill_resources(p['RESOURCE'], resource_types)
@@ -63,6 +60,25 @@ def list_vessels(sfs_file, show_debris):
             continue
         print(f"- {v['name']} ({v['type']})")
 
+def get_vessel_parts(vessel):
+    if type(vessel['PART']) == list:
+        parts_list = vessel['PART']
+    else:
+        parts_list = [vessel]
+    return parts_list
+
+def list_vessel_parts(vessel):
+    parts = get_vessel_parts(vessel)
+    resources_parts = [p for p in parts if 'RESOURCE' in p.keys()]
+    for rp in resources_parts:
+        print(rp['name'])
+        if type(rp['RESOURCE']) != list:
+            resources = [rp['RESOURCE']]
+        else:
+            resources = rp['RESOURCE']
+        for r in resources:
+            print(f" - {r['name']}")
+
 
 def main_fill(args):
     patch_sfs(args.save_file, args.ship_name, args.resources)
@@ -71,7 +87,12 @@ def main_fill(args):
 def main_list(args):
     list_vessels(args.save_file, args.show_debris)
 
-
+def main_parts(args):
+    ship_name = args.ship_name
+    sfs_file = args.save_file
+    data = sfsutils.parse_savefile(sfs_file)
+    vessel = find_vessel(data['GAME']['FLIGHTSTATE']['VESSEL'], ship_name)
+    list_vessel_parts(vessel)
 
 def main():
     parser = argparse.ArgumentParser(description="Fill Up Ships")
@@ -87,6 +108,10 @@ def main():
     parser_list.add_argument('--show-debris', action='store_true', default=False,
                              help='List debris as well')
     parser_list.set_defaults(func=main_list)
+
+    parser_parts = sub_parsers.add_parser('parts', help='List parts of vessel')
+    parser_parts.add_argument('ship_name', metavar='ship-name')
+    parser_parts.set_defaults(func=main_parts)
     args = parser.parse_args()
     args.func(args)
 
